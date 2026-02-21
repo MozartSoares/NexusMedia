@@ -11,5 +11,5 @@ export interface GetUploadUrlRequestDTO
 
 export interface GetUploadUrlResponseDTO {
   uploadUrl: string;
-  fileKey: string;
+  uploadToken: string;
 }

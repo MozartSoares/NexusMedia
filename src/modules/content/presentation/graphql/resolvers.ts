@@ -2,7 +2,11 @@ import type { Resolvers } from "@/generated/graphql";
 import { prisma } from "@/shared";
 import { CreatePost, GetUploadUrl } from "../../application/useCases";
 import { UnauthorizedError } from "../../domain/errors";
-import { PrismaPostRepository, S3StorageProvider } from "../../infra";
+import {
+  JwtUploadTokenProvider,
+  PrismaPostRepository,
+  S3StorageProvider,
+} from "../../infra";
 
 const s3Config = {
   endpoint: process.env.STORAGE_ENDPOINT || "http://localhost:9000",
@@ -17,9 +21,14 @@ const s3Config = {
 
 const postRepository = new PrismaPostRepository(prisma);
 const storageProvider = new S3StorageProvider(s3Config);
+const tokenProvider = new JwtUploadTokenProvider();
 
-const createPostUseCase = new CreatePost(postRepository, storageProvider);
-const getUploadUrlUseCase = new GetUploadUrl(storageProvider);
+const createPostUseCase = new CreatePost(
+  postRepository,
+  storageProvider,
+  tokenProvider,
+);
+const getUploadUrlUseCase = new GetUploadUrl(storageProvider, tokenProvider);
 
 export const contentResolvers: Resolvers = {
   Mutation: {

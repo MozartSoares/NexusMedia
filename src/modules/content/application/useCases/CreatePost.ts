@@ -4,9 +4,11 @@ import {
   FileProcessingError,
   type IPostRepository,
   type IStorageProvider,
+  type IUploadTokenProvider,
   MediaAttachment,
   PostFactory,
   StoragePath,
+  UnauthorizedError,
 } from "../../domain";
 import {
   type CreatePostRequestDTO,
@@ -19,6 +21,7 @@ export class CreatePost {
   constructor(
     private postRepository: IPostRepository,
     private storageProvider: IStorageProvider,
+    private tokenProvider: IUploadTokenProvider,
   ) {}
 
   async execute({
@@ -30,12 +33,20 @@ export class CreatePost {
   }): Promise<CreatePostResponseDTO> {
     const validated = CreatePostSchema.parse(data);
 
-    const tempPath = StoragePath.create(validated.fileKey);
+    const tokenPayload = this.tokenProvider.verifyToken(validated.uploadToken);
+
+    if (!tokenPayload || tokenPayload.userId !== userId) {
+      throw new UnauthorizedError("Invalid or expired upload token.");
+    }
+
+    const fileKey = tokenPayload.fileKey;
+
+    const tempPath = StoragePath.create(fileKey);
     tempPath.validateOwnership(userId);
 
     let metadata: { size: number; contentType: string; filename: string };
     try {
-      metadata = await this.storageProvider.getFileMetadata(validated.fileKey);
+      metadata = await this.storageProvider.getFileMetadata(fileKey);
     } catch {
       throw new FileNotFoundError();
     }

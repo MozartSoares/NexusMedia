@@ -39,9 +39,9 @@ export type AuthPayload = {
 };
 
 export type CreatePostInput = {
-  fileKey: Scalars["String"]["input"];
   tags?: InputMaybe<Array<Scalars["String"]["input"]>>;
   title: Scalars["String"]["input"];
+  uploadToken: Scalars["String"]["input"];
 };
 
 export type CreatePostResponse = {
@@ -110,7 +110,7 @@ export type RegisterInput = {
 
 export type UploadUrlResponse = {
   __typename?: "UploadUrlResponse";
-  fileKey: Scalars["String"]["output"];
+  uploadToken: Scalars["String"]["output"];
   uploadUrl: Scalars["String"]["output"];
 };
 
@@ -353,7 +353,7 @@ export type UploadUrlResponseResolvers<
   ParentType extends
     ResolversParentTypes["UploadUrlResponse"] = ResolversParentTypes["UploadUrlResponse"],
 > = {
-  fileKey?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  uploadToken?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
   uploadUrl?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
 };
 

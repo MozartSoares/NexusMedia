@@ -14,7 +14,7 @@ import {
 } from "@/modules/identity/presentation";
 import { AppError } from "@/shared";
 import type { GraphQLContext } from "@/shared/graphQlContext";
-import { tokenProvider } from "@/shared/infra/providers";
+import { tokenProvider } from "@/shared/infra/singletons";
 
 const server = new ApolloServer<GraphQLContext>({
   typeDefs: [identityTypeDefs, contentTypeDefs],
@@ -59,18 +59,23 @@ const server = new ApolloServer<GraphQLContext>({
   },
 });
 
-const handler = startServerAndCreateNextHandler<NextRequest, GraphQLContext>(server, {
-  context: async (req: NextRequest): Promise<GraphQLContext> => {
-    const authHeader = req.headers.get("authorization") || "";
-    if (!authHeader) return { user: null };
-    const token = authHeader.split(" ")[1];
-    if (!token) return { user: null };
-    const payload = tokenProvider.verifyToken(token);
+const handler = startServerAndCreateNextHandler<NextRequest, GraphQLContext>(
+  server,
+  {
+    context: async (req: NextRequest): Promise<GraphQLContext> => {
+      const authHeader = req.headers.get("authorization") || "";
+      if (!authHeader) return { user: null };
+      const token = authHeader.split(" ")[1];
+      if (!token) return { user: null };
+      const payload = tokenProvider.verifyToken(token);
 
-    return {
-      user: payload ? { id: payload.sub, username: payload.username } : null,
-    };
+      return {
+        user: payload
+          ? { id: payload.sub as string, username: payload.username as string }
+          : null,
+      };
+    },
   },
-});
+);
 
 export { handler as GET, handler as POST };

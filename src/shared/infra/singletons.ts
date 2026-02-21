@@ -1,7 +1,4 @@
-import {
-  BCryptHashProvider,
-  JWTokenProvider,
-} from "@/modules/identity/infra/providers";
+import { BCryptHashProvider, JWTokenProvider } from "./providers/index";
 
 // Singletons
 export const hashProvider = new BCryptHashProvider();

@@ -1,8 +1,7 @@
 import bcrypt from "bcryptjs";
-import type { IHashProvider } from "../../domain";
 
-export class BCryptHashProvider implements IHashProvider {
-  private salt = 10;
+export class BCryptHashProvider {
+  private salt = Number(process.env.BCRYPT_SALT);
 
   async hash(payload: string): Promise<string> {
     return bcrypt.hash(payload, this.salt);

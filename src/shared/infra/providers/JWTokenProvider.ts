@@ -1,9 +1,14 @@
 import jwt from "jsonwebtoken";
-import type { ITokenProvider, TokenPayload } from "../../domain";
 
-export class JWTokenProvider implements ITokenProvider {
+type TokenPayload = {
+  [key: string]: unknown;
+};
+export class JWTokenProvider {
   private secret = process.env.JWT_SECRET as string;
-  generateToken(payload: TokenPayload): string {
+  generateToken(payload: TokenPayload, expiresInSeconds?: number): string {
+    if (expiresInSeconds) {
+      return jwt.sign(payload, this.secret, { expiresIn: expiresInSeconds });
+    }
     return jwt.sign(payload, this.secret);
   }
   verifyToken(token: string): TokenPayload | null {

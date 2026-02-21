@@ -1,2 +1,2 @@
-export * from "./createPost";
-export * from "./getUploadUrl";
+export * from "./CreatePost";
+export * from "./GetUploadUrl";

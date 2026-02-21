@@ -6,17 +6,16 @@ import {
   RegisterUser,
 } from "../../application/useCases";
 import { UnauthorizedError } from "../../domain/errors";
+import type { ITokenProvider } from "../../domain/interfaces";
 import { PrismaUserRepository } from "../../infra/repositories";
 
-// --- COMPOSITION ROOT  ---
 const userRepository = new PrismaUserRepository(prisma);
 
-// use cases
 const registerUser = new RegisterUser(userRepository, hashProvider);
 const authenticateUser = new AuthenticateUser(
   userRepository,
   hashProvider,
-  tokenProvider,
+  tokenProvider as ITokenProvider,
 );
 const findUser = new FindUser(userRepository);
 

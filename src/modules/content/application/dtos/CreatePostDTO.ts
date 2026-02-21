@@ -3,7 +3,7 @@ import type { PostDto } from "./PostDto";
 
 export const CreatePostSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  fileKey: z.string().min(1, "File key is required"),
+  uploadToken: z.string().min(1, "Upload token is required"),
   tags: z.array(z.string()).default([]),
 });
 

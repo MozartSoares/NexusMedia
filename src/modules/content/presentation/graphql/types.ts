@@ -15,7 +15,7 @@ export const contentTypeDefs = gql`
 
   type UploadUrlResponse {
     uploadUrl: String!
-    fileKey: String!
+    uploadToken: String!
   }
 
   type CreatePostResponse {
@@ -30,7 +30,7 @@ export const contentTypeDefs = gql`
 
   input CreatePostInput {
     title: String!
-    fileKey: String!
+    uploadToken: String!
     tags: [String!]
   }
 
