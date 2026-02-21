@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { ITokenProvider,TokenPayload } from "../../domain/interfaces/ITokenProvider";
+import { ITokenProvider,TokenPayload } from "../../domain";
 
 export class JWTokenProvider implements ITokenProvider {
   private secret = process.env.JWT_SECRET as string;

@@ -1,6 +1,5 @@
 import { UserFactory } from "../../application/factories/UserFactory";
-import { User } from "../../domain/entities/User";
-import { IUserRepository } from "../../domain/interfaces/IUserRepository";
+import { User,IUserRepository } from "../../domain";
 import { PrismaClient } from "@/generated/prisma";
 
 export class PrismaUserRepository implements IUserRepository {

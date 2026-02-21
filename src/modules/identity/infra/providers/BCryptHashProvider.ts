@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { IHashProvider } from "../../domain/interfaces/IHashProvider";
+import { IHashProvider } from "../../domain";
 
 export class BCryptHashProvider implements IHashProvider {
   private salt = 10;
