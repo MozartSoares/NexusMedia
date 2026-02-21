@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🌐 NexusMedia: An Architectural Deep-Dive Laboratory
 
-## Getting Started
+> **"Simplicity is the final achievement." — This project is the journey toward that achievement through rigorous engineering.**
 
-First, run the development server:
+## 🎯 The Purpose
+NexusMedia is not just a social media platform; it is a **deliberate engineering laboratory**. The primary goal of this project is to explore, implement, and stress-test high-level software architecture patterns in a "Production-Ready" environment. 
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+In a world where "just making it work" is the norm, NexusMedia stands as a commitment to **Architectural Rigor**. It is an intentional exploration of how complex systems can be decoupled, typed, and scaled using enterprise-grade principles.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🧠 The Philosophy: Why "Overengineer"?
+Every architectural choice in this repository—from Value Objects to custom Mappers—is a conscious decision to favor **long-term maintainability over short-term speed**. 
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The core philosophy is built on three pillars:
 
-## Learn More
+1. **Domain Supremacy:** The business logic (Domain) is the heart of the system. It remains pure, agnostic to frameworks, databases, or external APIs.
+2. **Persistence Agnosticism:** The system is designed so that the database or the delivery mechanism (GraphQL/REST) can be swapped with minimal friction. 
+3. **Type-Safety as a Shield:** Leveraging TypeScript and GraphQL Codegen to create an end-to-end type-safe environment, reducing runtime errors and cognitive load.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🏗️ Architectural Foundations
+Instead of following a traditional MVC approach, NexusMedia utilizes:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+* **Clean Architecture:** Strict separation of concerns to ensure that the code is easy to test and evolve.
+* **Domain-Driven Design (DDD):** Using Rich Entities, Value Objects, and Factories to model the business as closely as possible to reality.
+* **Solid Infrastructure:** Centralized dependency injection (Composition Root) and semantic error handling to ensure a robust system behavior.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🛠️ Tech Stack (The Toolbox)
+The project leverages a modern, high-performance stack:
+- **Core:** Next.js 15 (App Router) & Node.js.
+- **API:** Apollo Server (GraphQL) with full Type-Safety.
+- **Persistence:** PostgreSQL & Prisma ORM.
+- **Integrity:** Zod for runtime validation and BCrypt for security.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## 📈 Current State & Evolution
+NexusMedia is built module by module. We prioritize finishing one domain with **100% architectural integrity** before moving to the next.
+
+Currently, the foundation of **Identity & Authentication** is complete, serving as the blueprint for the upcoming domains:
+- **Content Domain:** Handling complex media, social feeds, and interactions.
+- **Storage Infrastructure:** Implementing scalable object storage patterns.
+- **Observability:** Integrating professional-grade logging and monitoring.
+
+---
+
+*This is a living laboratory. It moves at the pace of quality, not the pace of features.*
