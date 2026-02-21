@@ -7,7 +7,7 @@ import { treeifyError, ZodError } from "zod";
 import {
   identityResolvers,
   identityTypeDefs,
-} from "@/modules/identity/presentation/graphql";
+} from "@/modules/identity/presentation";
 import { AppError } from "@/shared";
 import type { GraphQLContext } from "@/shared/graphQlContext";
 import { tokenProvider } from "@/shared/infra/providers";

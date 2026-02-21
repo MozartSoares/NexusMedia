@@ -1,4 +1,4 @@
-types/
+**/types/**
 .next/
 *.min.js
 dist/**

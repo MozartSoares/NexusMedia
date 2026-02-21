@@ -1,3 +1,5 @@
+import { InvalidEmailError } from "../errors";
+
 export class Email {
   private readonly value: string;
 
@@ -6,7 +8,7 @@ export class Email {
   }
 
   static create(email: string): Email {
-    if (!Email.validate(email)) throw new Error("Invalid email format");
+    if (!Email.validate(email)) throw new InvalidEmailError();
     return new Email(email);
   }
 

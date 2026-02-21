@@ -1,3 +1,5 @@
+import { InvalidPasswordError } from "../errors";
+
 export class Password {
   private readonly value: string;
 
@@ -6,8 +8,7 @@ export class Password {
   }
 
   static create(password: string): Password {
-    if (!Password.validate(password))
-      throw new Error("Invalid password format");
+    if (!Password.validate(password)) throw new InvalidPasswordError();
     return new Password(password);
   }
 

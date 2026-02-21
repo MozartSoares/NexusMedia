@@ -5,6 +5,7 @@ import {
   FindUser,
   RegisterUser,
 } from "../../application/useCases";
+import { UnauthorizedError } from "../../domain/errors";
 import { PrismaUserRepository } from "../../infra/repositories";
 
 // --- COMPOSITION ROOT  ---
@@ -33,7 +34,7 @@ export const identityResolvers: Resolvers = {
   Query: {
     me: async (_, __, context) => {
       if (!context.user) {
-        throw new Error("Unauthorized");
+        throw new UnauthorizedError();
       }
 
       return await findUser.execute(context.user.id);

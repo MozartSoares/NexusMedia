@@ -1,11 +1,9 @@
 import {
-  Email,
   type IHashProvider,
+  InvalidCredentialsError,
   type ITokenProvider,
   type IUserRepository,
-  Password,
 } from "../../domain";
-import { InvalidCredentialsError } from "../../domain/errors";
 import {
   type AuthenticateUserRequestDTO,
   type AuthenticateUserResponseDTO,

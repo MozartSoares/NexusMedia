@@ -1,5 +1,5 @@
 import { generateUserId } from "@/shared/idGenerator";
-import { Email, Password, User, type UserProps } from "../../domain";
+import { Email, User, type UserProps } from "../../domain";
 
 export class UserFactory {
   static create(props: Omit<UserProps, "created_at">): User {

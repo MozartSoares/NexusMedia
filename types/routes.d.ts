@@ -14,6 +14,7 @@ type Routes =
   | RewriteRoutes;
 
 interface ParamMap {
+  // biome-ignore lint/complexity/noBannedTypes: Next.js generated
   "/": {};
 }
 

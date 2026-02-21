@@ -2,8 +2,8 @@ import {
   type IHashProvider,
   type IUserRepository,
   Password,
+  UserAlreadyExistsError,
 } from "../../domain";
-import { UserAlreadyExistsError } from "../../domain/errors";
 import {
   type RegisterUserRequestDTO,
   type RegisterUserResponseDTO,
