@@ -6,7 +6,8 @@ export class Password {
   }
 
   static create(password: string): Password {
-    if (!this.validate(password)) throw new Error("Invalid password format");
+    if (!Password.validate(password))
+      throw new Error("Invalid password format");
     return new Password(password);
   }
 
@@ -14,5 +15,7 @@ export class Password {
     return password.length >= 8;
   }
 
-  get getValue(): string { return this.value; }
+  get getValue(): string {
+    return this.value;
+  }
 }

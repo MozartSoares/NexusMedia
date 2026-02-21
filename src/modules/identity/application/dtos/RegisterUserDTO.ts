@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { UserDto } from "./UserDto";
+import type { UserDto } from "./UserDto";
 
 export const RegisterUserSchema = z.object({
   email: z.email("Invalid email format"),
@@ -7,6 +7,7 @@ export const RegisterUserSchema = z.object({
   password_plain: z.string().min(8, "Password must have at least 8 characters"),
 });
 
-export interface RegisterUserRequestDTO extends z.infer<typeof RegisterUserSchema> {}
+export interface RegisterUserRequestDTO
+  extends z.infer<typeof RegisterUserSchema> {}
 
 export type RegisterUserResponseDTO = UserDto;

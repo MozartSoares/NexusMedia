@@ -1,18 +1,24 @@
-import { ApolloServer } from '@apollo/server';
-import { startServerAndCreateNextHandler } from '@as-integrations/next';
-import { identityTypeDefs, identityResolvers } from '@/modules/identity/presentation/graphql';
-import { NextRequest } from 'next/server';
-import { GraphQLContext } from '@/shared/graphQlContext';
-import { tokenProvider } from '@/shared/infra/providers';
-import { AppError } from '@/shared';
-import { unwrapResolverError } from '@apollo/server/errors';
-import  { ZodError,treeifyError} from 'zod';
-import { GraphQLFormattedError } from 'graphql';
+import { ApolloServer } from "@apollo/server";
+import { unwrapResolverError } from "@apollo/server/errors";
+import { startServerAndCreateNextHandler } from "@as-integrations/next";
+import type { GraphQLFormattedError } from "graphql";
+import type { NextRequest } from "next/server";
+import { treeifyError, ZodError } from "zod";
+import {
+  identityResolvers,
+  identityTypeDefs,
+} from "@/modules/identity/presentation/graphql";
+import { AppError } from "@/shared";
+import type { GraphQLContext } from "@/shared/graphQlContext";
+import { tokenProvider } from "@/shared/infra/providers";
 
 const server = new ApolloServer({
   typeDefs: identityTypeDefs,
   resolvers: identityResolvers,
-  formatError: (formattedError:GraphQLFormattedError, error:unknown):GraphQLFormattedError=> {
+  formatError: (
+    formattedError: GraphQLFormattedError,
+    error: unknown,
+  ): GraphQLFormattedError => {
     const originalError = unwrapResolverError(error);
     if (originalError instanceof AppError) {
       return {
@@ -31,37 +37,36 @@ const server = new ApolloServer({
         message: "Validation error on input data.",
         extensions: {
           ...formattedError.extensions,
-          code: 'BAD_USER_INPUT',
+          code: "BAD_USER_INPUT",
           fieldErrors: treeifyError(originalError),
         },
       };
     }
-    if (process.env.NODE_ENV !== 'production') {
+    if (process.env.NODE_ENV !== "production") {
       console.error("[GraphQL Error]:", originalError || error);
     } else {
       console.error("Internal server error"); //Sentry.captureException(error);
     }
 
     return {
-      message: 'Internal server error',
-      extensions: { code: 'INTERNAL_SERVER_ERROR' },
+      message: "Internal server error",
+      extensions: { code: "INTERNAL_SERVER_ERROR" },
     };
   },
 });
 
 const handler = startServerAndCreateNextHandler<NextRequest>(server, {
   context: async (req: NextRequest): Promise<GraphQLContext> => {
-    const authHeader = req.headers.get('authorization') || '';
-    if (!authHeader) return {user:null}
-    const token = authHeader.split(' ')[1];
-    if (!token) return {user:null}
+    const authHeader = req.headers.get("authorization") || "";
+    if (!authHeader) return { user: null };
+    const token = authHeader.split(" ")[1];
+    if (!token) return { user: null };
     const payload = tokenProvider.verifyToken(token);
 
-    return { 
-      user: payload ? { id: payload.sub, username: payload.username } : null 
+    return {
+      user: payload ? { id: payload.sub, username: payload.username } : null,
     };
   },
 });
-
 
 export { handler as GET, handler as POST };

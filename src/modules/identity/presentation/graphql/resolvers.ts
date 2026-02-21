@@ -1,25 +1,33 @@
-import { PrismaUserRepository } from "../../infra/repositories";
-import { hashProvider,tokenProvider,prisma } from "@/shared";
-import { RegisterUser,AuthenticateUser,FindUser } from "../../application/useCases";
 import type { Resolvers } from "@/generated/graphql";
+import { hashProvider, prisma, tokenProvider } from "@/shared";
+import {
+  AuthenticateUser,
+  FindUser,
+  RegisterUser,
+} from "../../application/useCases";
+import { PrismaUserRepository } from "../../infra/repositories";
 
 // --- COMPOSITION ROOT  ---
 const userRepository = new PrismaUserRepository(prisma);
 
 // use cases
 const registerUser = new RegisterUser(userRepository, hashProvider);
-const authenticateUser = new AuthenticateUser(userRepository, hashProvider, tokenProvider);
+const authenticateUser = new AuthenticateUser(
+  userRepository,
+  hashProvider,
+  tokenProvider,
+);
 const findUser = new FindUser(userRepository);
 
 export const identityResolvers: Resolvers = {
   Mutation: {
-    register: async (_, {input}) => {
+    register: async (_, { input }) => {
       return await registerUser.execute(input);
     },
 
-    login: async (_, {input}) => {
+    login: async (_, { input }) => {
       return await authenticateUser.execute(input);
-    }
+    },
   },
 
   Query: {
@@ -27,8 +35,8 @@ export const identityResolvers: Resolvers = {
       if (!context.user) {
         throw new Error("Unauthorized");
       }
-      
+
       return await findUser.execute(context.user.id);
-    }
-  }
+    },
+  },
 };

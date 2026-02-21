@@ -6,7 +6,7 @@ export class Email {
   }
 
   static create(email: string): Email {
-    if (!this.validate(email)) throw new Error("Invalid email format");
+    if (!Email.validate(email)) throw new Error("Invalid email format");
     return new Email(email);
   }
 
@@ -15,5 +15,7 @@ export class Email {
     return emailRegex.test(email);
   }
 
-  get getValue(): string { return this.value; }
+  get getValue(): string {
+    return this.value;
+  }
 }

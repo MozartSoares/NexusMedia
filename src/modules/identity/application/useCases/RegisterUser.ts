@@ -1,19 +1,31 @@
-import { RegisterUserRequestDTO, RegisterUserResponseDTO, RegisterUserSchema } from "../dtos";
-import { IHashProvider,IUserRepository, Password } from "../../domain";
+import {
+  type IHashProvider,
+  type IUserRepository,
+  Password,
+} from "../../domain";
+import { UserAlreadyExistsError } from "../../domain/errors";
+import {
+  type RegisterUserRequestDTO,
+  type RegisterUserResponseDTO,
+  RegisterUserSchema,
+} from "../dtos";
 import { UserFactory } from "../factories/UserFactory";
 import { UserMapper } from "../mappers/UserMapper";
-import { UserAlreadyExistsError } from "../../domain/errors";
-
 
 export class RegisterUser {
-  constructor(private userRepository: IUserRepository, private hashProvider: IHashProvider) {}
+  constructor(
+    private userRepository: IUserRepository,
+    private hashProvider: IHashProvider,
+  ) {}
 
-  async execute(data: RegisterUserRequestDTO): Promise<RegisterUserResponseDTO> {
+  async execute(
+    data: RegisterUserRequestDTO,
+  ): Promise<RegisterUserResponseDTO> {
     const validatedData = RegisterUserSchema.parse(data);
 
-    const [emailExists,usernameExists] = await Promise.all([
+    const [emailExists, usernameExists] = await Promise.all([
       this.userRepository.findByEmail(validatedData.email),
-      this.userRepository.findByUsername(validatedData.username)
+      this.userRepository.findByUsername(validatedData.username),
     ]);
     if (emailExists) {
       throw new UserAlreadyExistsError("email");
@@ -28,7 +40,7 @@ export class RegisterUser {
     const newUser = UserFactory.create({
       email: validatedData.email,
       username: validatedData.username,
-      password_hash
+      password_hash,
     });
 
     const user = await this.userRepository.save(newUser);

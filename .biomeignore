@@ -1,0 +1,8 @@
+types/
+.next/
+*.min.js
+dist/**
+coverage/**
+.nyc_output/**
+build/**
+reports/**
