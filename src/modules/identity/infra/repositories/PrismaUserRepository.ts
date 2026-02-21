@@ -1,5 +1,5 @@
 import type { PrismaClient } from "@/generated/prisma";
-import type { IUserRepository, User,UserFactory } from "../../domain";
+import { type IUserRepository, type User, UserFactory } from "../../domain";
 
 export class PrismaUserRepository implements IUserRepository {
   constructor(private prisma: PrismaClient) {}

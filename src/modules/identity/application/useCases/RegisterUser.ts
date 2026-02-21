@@ -1,4 +1,4 @@
-import { generateUserId } from "@/shared/idGenerator";
+import { createEntityId } from "@/shared/idGenerator";
 import {
   type IHashProvider,
   type IUserRepository,
@@ -38,7 +38,7 @@ export class RegisterUser {
     const passwordVO = Password.create(validatedData.password_plain);
     const password_hash = await this.hashProvider.hash(passwordVO.value);
 
-    const id = generateUserId();
+    const id = createEntityId();
     const newUser = UserFactory.create(
       {
         email: validatedData.email,

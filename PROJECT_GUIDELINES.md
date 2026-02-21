@@ -1,6 +1,6 @@
 # NexusMedia — Project Guidelines
 
-> **Version:** 1.0 · **Date:** 2026-02-21 · **Project Status:** MVP in development
+> **Version:** 1.1 · **Date:** 2026-02-21 · **Project Status:** MVP in development
 
 ---
 
@@ -72,16 +72,16 @@ Each module follows the structure already established by the Identity module:
 
 ```
 src/modules/<module>/
-├── domain/              # Entities, Value Objects, Repository Interfaces, Errors
+├── domain/              # Entities, Value Objects, Factories, Repository Interfaces, Errors
 │   ├── entities/
 │   ├── value-objects/
+│   ├── factories/       # Entity creation + VO validation boundary
 │   ├── interfaces/
 │   └── errors.ts
-├── application/         # Use Cases, DTOs (with Zod schemas), Mappers, Factories
+├── application/         # Use Cases, DTOs (with Zod schemas), Mappers
 │   ├── useCases/
 │   ├── dtos/
-│   ├── mappers/
-│   └── factories/
+│   └── mappers/
 ├── infra/               # Concrete implementations (Prisma Repos, S3 Providers, etc.)
 │   ├── repositories/
 │   └── providers/
@@ -99,13 +99,41 @@ presentation → application → domain
                   infra (implements domain interfaces)
 ```
 
-- **`domain`** does not import anything from other layers.
-- **`application`** depends only on `domain` (interfaces).
-- **`infra`** implements the interfaces defined in `domain`.
+- **`domain`** does not import anything from other layers. The only exception is `@/shared/errors/AppError` for the error base class and `@/shared/idGenerator` is **not** used in domain — ID generation is the caller's responsibility.
+- **`application`** depends only on `domain` (interfaces, factories, entities).
+- **`infra`** implements the interfaces defined in `domain`. Repositories use `Factory.restore()` to rehydrate entities.
 - **`presentation`** acts as the **Composition Root**: instantiates concrete repositories and providers, injects them into Use Cases.
 
 > [!IMPORTANT]
 > No module should import directly from another module. Communication between modules happens exclusively through the database (Foreign Keys) or the `shared/` layer.
+
+### 2.5 Value Object & Factory Conventions
+
+**Entities store primitives** (strings, numbers, dates) — not Value Object instances. This is critical because the system is **query-heavy**: reconstructing entities from the database must have zero validation overhead.
+
+**Value Objects validate at the mutation boundary only:**
+- `Factory.create()` instantiates VOs (`Email.create()`, `Username.create()`) to validate, then stores `.value` (the primitive) in the entity.
+- `Factory.restore()` bypasses all validation — data from the DB is already trusted.
+
+**Value Object structure convention:**
+```typescript
+export class Email {
+  private readonly _value: string;
+  private constructor(email: string) { this._value = email; }
+
+  static create(value: string): Email { /* validate + throw AppError */ }
+  static validate(value: string): boolean { /* pure check */ }
+  get value(): string { return this._value; }
+}
+```
+
+**Factory receives the ID as a parameter** — it does not generate IDs. The Use Case is responsible for generating the ID (`generateUserId()`) and passing it to the factory. This keeps the factory a pure domain concern with no infrastructure dependencies.
+
+```typescript
+// Use Case generates ID and delegates to Factory
+const id = generateUserId();
+const user = UserFactory.create({ email, username, password_hash }, id);
+```
 
 ### 2.4 Shared Layer (`src/shared/`)
 
@@ -130,9 +158,6 @@ src/shared/
 ```mermaid
 erDiagram
     User ||--o{ Post : "has many"
-    Post }o--o{ Tag : "many-to-many"
-    Post ||--o{ PostTag : "has many"
-    Tag ||--o{ PostTag : "has many"
 
     User {
         string id PK "CUID2"
@@ -145,26 +170,17 @@ erDiagram
     Post {
         string id PK "CUID2"
         string title
-        string file_key "object storage key"
-        string user_id FK
+        string storage_path "object storage key"
+        string author_id FK
+        int size "bytes"
+        string_array tags "text array"
+        string mime_type
+        string status
         datetime created_at
-    }
-
-    Tag {
-        string id PK "CUID2"
-        string name UK
-        datetime created_at
-    }
-
-    PostTag {
-        string post_id FK "Composite PK"
-        string tag_id FK "Composite PK"
     }
 ```
 
-### 3.2 Prisma Schema (expanded)
-
-The current schema contains only the `User` model. Below is the complete schema required for the MVP:
+### 3.2 Prisma Schema
 
 ```prisma
 model User {
@@ -178,46 +194,34 @@ model User {
 }
 
 model Post {
-  id         String   @id @unique
-  title      String
-  file_key   String
-  user_id    String
-  created_at DateTime @default(now())
+  id           String   @id @unique
+  title        String
+  storage_path String
+  author_id    String
+  size         Int
+  tags         String[]
+  mime_type    String
+  status       String   @default("PUBLISHED")
+  created_at   DateTime @default(now())
 
-  user User      @relation(fields: [user_id], references: [id])
-  tags PostTag[]
-}
+  author User @relation(fields: [author_id], references: [id])
 
-model Tag {
-  id         String   @id @unique
-  name       String   @unique
-  created_at DateTime @default(now())
-
-  posts PostTag[]
-}
-
-model PostTag {
-  post_id String
-  tag_id  String
-
-  post Post @relation(fields: [post_id], references: [id])
-  tag  Tag  @relation(fields: [tag_id], references: [id])
-
-  @@id([post_id, tag_id])
+  @@index([created_at(sort: Desc)])
+  @@index([author_id])
 }
 ```
 
-### 3.3 Recommended Indexes
+Tags are stored as a **PostgreSQL text array** directly on the Post row. No separate `Tag` table or pivot table.
+
+### 3.3 Indexes
 
 | Table | Index | Type | Rationale |
 |---|---|---|---|
 | `Post` | `created_at` | B-Tree (DESC) | Cursor-based pagination in the feed |
-| `Post` | `user_id` | B-Tree | Query of posts by author |
-| `PostTag` | `tag_id` | B-Tree | Query of posts by tag (join) |
-| `Tag` | `name` | Unique (existing) | Tag search by name |
+| `Post` | `author_id` | B-Tree | Query of posts by author |
 
 > [!NOTE]
-> **Design Inference:** The indexes on `Post.created_at` and `PostTag.tag_id` were not specified in the requirements but are strongly recommended to meet the < 200ms latency goal for the feed and tag search.
+> PostgreSQL supports GIN indexes on array columns. If tag-based queries become a performance bottleneck, a GIN index on `Post.tags` can be added later.
 
 ---
 
@@ -274,40 +278,24 @@ sequenceDiagram
 ```typescript
 interface PostProps {
   title: string;
-  file_key: string;
-  user_id: string;
+  storage_path: string;
+  author_id: string;
+  size: number;
+  tags: string[];
+  mime_type: string;
+  status: "PUBLISHED";
   created_at?: Date;
 }
 ```
 
-- **Suggested Value Objects:** `Title` (min/max length validation), `FileKey` (format validation).
-
-#### `Tag`
-
-```typescript
-interface TagProps {
-  name: string;
-  created_at?: Date;
-}
-```
-
-- **Suggested Value Object:** `TagName` (lowercase normalization, charset validation).
+**Value Objects (validated in Factory):** `Title` (1–120 chars), `MimeType` (allowlist), `TagName` (lowercase, 1–30 chars, alphanumeric + hyphens).
 
 ### 4.4 Repository Interfaces
 
 ```typescript
-// IPostRepository
 interface IPostRepository {
   save(post: Post): Promise<Post>;
   findById(id: string): Promise<Post | null>;
-  findByUserId(userId: string): Promise<Post[]>;
-}
-
-// ITagRepository
-interface ITagRepository {
-  findOrCreate(name: string): Promise<Tag>;
-  findByName(name: string): Promise<Tag | null>;
-  attachTagsToPost(postId: string, tagIds: string[]): Promise<void>;
 }
 ```
 
@@ -502,11 +490,15 @@ All domain errors extend `AppError` (already implemented in `shared/errors/`):
 
 ```
 AppError (abstract)
-├── UserAlreadyExistsError       # Identity
-├── InvalidCredentialsError      # Identity
-├── FileNotFoundError            # Content — file does not exist in storage
-├── InvalidFileTypeError         # Content — MIME type not allowed
-├── UploadUrlGenerationError     # Content — failed to generate presigned URL
+├── InvalidCredentialsError      # Identity — wrong email/password combo
+├── InvalidEmailError            # Identity — VO validation
+├── InvalidPasswordError         # Identity — VO validation
+├── InvalidUsernameError         # Identity — VO validation
+├── UnauthorizedError            # Identity — missing/invalid JWT
+├── UserAlreadyExistsError       # Identity — duplicate email/username
+├── InvalidTitleError            # Content — VO validation
+├── InvalidMimeTypeError         # Content — VO validation
+├── InvalidTagNameError          # Content — VO validation
 ├── PostNotFoundError            # Discovery
 └── InvalidCursorError           # Discovery — malformed cursor
 ```
@@ -619,10 +611,12 @@ const config: CodegenConfig = {
 
 | Aspect | Convention |
 |---|---|
-| **IDs** | Server-side CUID2 (`@paralleldrive/cuid2`) |
+| **IDs** | CUID2 (`@paralleldrive/cuid2`), generated in the Use Case, passed to Factory |
 | **Input Validation** | Zod schemas in `application` layer DTOs |
+| **Domain Validation** | Value Objects in `domain/value-objects/`, invoked by Factory |
 | **Domain Errors** | Classes extending `AppError` with `message` and `code` |
-| **Entity Instantiation** | Via `Factory` (create for new, restore for DB rehydration) |
+| **Entity Props** | Primitives only (strings, numbers, dates) — never VO instances |
+| **Entity Instantiation** | Via `Factory` in `domain/factories/` (create validates, restore bypasses) |
 | **Data Mapping** | Via static `Mapper` (entity → DTO) |
 | **Dependency Injection** | Manual via Composition Root in resolvers |
 | **Exports** | Barrel files (`index.ts`) in each directory |
@@ -631,4 +625,4 @@ const config: CodegenConfig = {
 
 ---
 
-*Document maintained by the architecture team. Last updated: 2026-02-21.*
+*Document maintained by the architecture team. Last updated: 2026-02-21 (v1.1 — factory moved to domain, VO conventions, error hierarchy update).*
