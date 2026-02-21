@@ -4,10 +4,49 @@ import { identityTypeDefs, identityResolvers } from '@/modules/identity/presenta
 import { NextRequest } from 'next/server';
 import { GraphQLContext } from '@/shared/graphQlContext';
 import { tokenProvider } from '@/shared/infra/providers';
+import { AppError } from '@/shared';
+import { unwrapResolverError } from '@apollo/server/errors';
+import  { ZodError,treeifyError} from 'zod';
+import { GraphQLFormattedError } from 'graphql';
 
 const server = new ApolloServer({
   typeDefs: identityTypeDefs,
   resolvers: identityResolvers,
+  formatError: (formattedError:GraphQLFormattedError, error:unknown):GraphQLFormattedError=> {
+    const originalError = unwrapResolverError(error);
+    if (originalError instanceof AppError) {
+      return {
+        ...formattedError,
+        message: originalError.message,
+        extensions: {
+          ...formattedError.extensions,
+          code: originalError.code,
+        },
+      };
+    }
+
+    if (originalError instanceof ZodError) {
+      return {
+        ...formattedError,
+        message: "Validation error on input data.",
+        extensions: {
+          ...formattedError.extensions,
+          code: 'BAD_USER_INPUT',
+          fieldErrors: treeifyError(originalError),
+        },
+      };
+    }
+    if (process.env.NODE_ENV !== 'production') {
+      console.error("[GraphQL Error]:", originalError || error);
+    } else {
+      console.error("Internal server error"); //Sentry.captureException(error);
+    }
+
+    return {
+      message: 'Internal server error',
+      extensions: { code: 'INTERNAL_SERVER_ERROR' },
+    };
+  },
 });
 
 const handler = startServerAndCreateNextHandler<NextRequest>(server, {

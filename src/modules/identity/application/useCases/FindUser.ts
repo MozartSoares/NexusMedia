@@ -1,4 +1,4 @@
-import { User,IUserRepository } from "../../domain";
+import { IUserRepository } from "../../domain";
 import { UserDto } from "../dtos";
 import { UserMapper } from "../mappers/UserMapper";
 
