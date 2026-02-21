@@ -29,6 +29,12 @@ export class MediaAttachment {
     this._size = size;
   }
 
+  static validateSize(size: number) {
+    if (size > MAX_FILE_SIZE) {
+      throw new FileTooLargeError(MAX_FILE_SIZE);
+    }
+  }
+
   static create({
     filename: rawFilename,
     contentType,
@@ -56,9 +62,7 @@ export class MediaAttachment {
         .replace(/^-|-$/g, "")
         .slice(0, 64) || "file";
 
-    if (size > MAX_FILE_SIZE) {
-      throw new FileTooLargeError(MAX_FILE_SIZE);
-    }
+    MediaAttachment.validateSize(size);
 
     return new MediaAttachment(ext, mimeType, sanitized, size);
   }

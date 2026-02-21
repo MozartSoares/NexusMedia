@@ -1,4 +1,5 @@
 import type { GraphQLResolveInfo } from "graphql";
+import type { GraphQLContext } from "@/shared/graphQlContext";
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = {
@@ -37,6 +38,23 @@ export type AuthPayload = {
   user: User;
 };
 
+export type CreatePostInput = {
+  fileKey: Scalars["String"]["input"];
+  tags?: InputMaybe<Array<Scalars["String"]["input"]>>;
+  title: Scalars["String"]["input"];
+};
+
+export type CreatePostResponse = {
+  __typename?: "CreatePostResponse";
+  post: Post;
+};
+
+export type GetUploadUrlInput = {
+  contentType: Scalars["String"]["input"];
+  filename: Scalars["String"]["input"];
+  size: Scalars["Int"]["input"];
+};
+
 export type LoginInput = {
   email: Scalars["String"]["input"];
   password_plain: Scalars["String"]["input"];
@@ -44,8 +62,18 @@ export type LoginInput = {
 
 export type Mutation = {
   __typename?: "Mutation";
+  createPost: CreatePostResponse;
+  getUploadUrl: UploadUrlResponse;
   login: AuthPayload;
   register: User;
+};
+
+export type MutationCreatePostArgs = {
+  input: CreatePostInput;
+};
+
+export type MutationGetUploadUrlArgs = {
+  input: GetUploadUrlInput;
 };
 
 export type MutationLoginArgs = {
@@ -54,6 +82,19 @@ export type MutationLoginArgs = {
 
 export type MutationRegisterArgs = {
   input: RegisterInput;
+};
+
+export type Post = {
+  __typename?: "Post";
+  authorId: Scalars["String"]["output"];
+  createdAt: Scalars["String"]["output"];
+  id: Scalars["ID"]["output"];
+  mimeType: Scalars["String"]["output"];
+  size: Scalars["Int"]["output"];
+  status: Scalars["String"]["output"];
+  tags: Array<Scalars["String"]["output"]>;
+  title: Scalars["String"]["output"];
+  url: Scalars["String"]["output"];
 };
 
 export type Query = {
@@ -65,6 +106,12 @@ export type RegisterInput = {
   email: Scalars["String"]["input"];
   password_plain: Scalars["String"]["input"];
   username: Scalars["String"]["input"];
+};
+
+export type UploadUrlResponse = {
+  __typename?: "UploadUrlResponse";
+  fileKey: Scalars["String"]["output"];
+  uploadUrl: Scalars["String"]["output"];
 };
 
 export type User = {
@@ -195,12 +242,18 @@ export type DirectiveResolverFn<
 export type ResolversTypes = {
   AuthPayload: ResolverTypeWrapper<AuthPayload>;
   Boolean: ResolverTypeWrapper<Scalars["Boolean"]["output"]>;
+  CreatePostInput: CreatePostInput;
+  CreatePostResponse: ResolverTypeWrapper<CreatePostResponse>;
+  GetUploadUrlInput: GetUploadUrlInput;
   ID: ResolverTypeWrapper<Scalars["ID"]["output"]>;
+  Int: ResolverTypeWrapper<Scalars["Int"]["output"]>;
   LoginInput: LoginInput;
   Mutation: ResolverTypeWrapper<Record<PropertyKey, never>>;
+  Post: ResolverTypeWrapper<Post>;
   Query: ResolverTypeWrapper<Record<PropertyKey, never>>;
   RegisterInput: RegisterInput;
   String: ResolverTypeWrapper<Scalars["String"]["output"]>;
+  UploadUrlResponse: ResolverTypeWrapper<UploadUrlResponse>;
   User: ResolverTypeWrapper<User>;
 };
 
@@ -208,17 +261,23 @@ export type ResolversTypes = {
 export type ResolversParentTypes = {
   AuthPayload: AuthPayload;
   Boolean: Scalars["Boolean"]["output"];
+  CreatePostInput: CreatePostInput;
+  CreatePostResponse: CreatePostResponse;
+  GetUploadUrlInput: GetUploadUrlInput;
   ID: Scalars["ID"]["output"];
+  Int: Scalars["Int"]["output"];
   LoginInput: LoginInput;
   Mutation: Record<PropertyKey, never>;
+  Post: Post;
   Query: Record<PropertyKey, never>;
   RegisterInput: RegisterInput;
   String: Scalars["String"]["output"];
+  UploadUrlResponse: UploadUrlResponse;
   User: User;
 };
 
 export type AuthPayloadResolvers<
-  ContextType = any,
+  ContextType = GraphQLContext,
   ParentType extends
     ResolversParentTypes["AuthPayload"] = ResolversParentTypes["AuthPayload"],
 > = {
@@ -226,11 +285,31 @@ export type AuthPayloadResolvers<
   user?: Resolver<ResolversTypes["User"], ParentType, ContextType>;
 };
 
+export type CreatePostResponseResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends
+    ResolversParentTypes["CreatePostResponse"] = ResolversParentTypes["CreatePostResponse"],
+> = {
+  post?: Resolver<ResolversTypes["Post"], ParentType, ContextType>;
+};
+
 export type MutationResolvers<
-  ContextType = any,
+  ContextType = GraphQLContext,
   ParentType extends
     ResolversParentTypes["Mutation"] = ResolversParentTypes["Mutation"],
 > = {
+  createPost?: Resolver<
+    ResolversTypes["CreatePostResponse"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationCreatePostArgs, "input">
+  >;
+  getUploadUrl?: Resolver<
+    ResolversTypes["UploadUrlResponse"],
+    ParentType,
+    ContextType,
+    RequireFields<MutationGetUploadUrlArgs, "input">
+  >;
   login?: Resolver<
     ResolversTypes["AuthPayload"],
     ParentType,
@@ -245,16 +324,41 @@ export type MutationResolvers<
   >;
 };
 
+export type PostResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends
+    ResolversParentTypes["Post"] = ResolversParentTypes["Post"],
+> = {
+  authorId?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
+  mimeType?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  size?: Resolver<ResolversTypes["Int"], ParentType, ContextType>;
+  status?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  tags?: Resolver<Array<ResolversTypes["String"]>, ParentType, ContextType>;
+  title?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  url?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+};
+
 export type QueryResolvers<
-  ContextType = any,
+  ContextType = GraphQLContext,
   ParentType extends
     ResolversParentTypes["Query"] = ResolversParentTypes["Query"],
 > = {
   me?: Resolver<Maybe<ResolversTypes["User"]>, ParentType, ContextType>;
 };
 
+export type UploadUrlResponseResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends
+    ResolversParentTypes["UploadUrlResponse"] = ResolversParentTypes["UploadUrlResponse"],
+> = {
+  fileKey?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  uploadUrl?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+};
+
 export type UserResolvers<
-  ContextType = any,
+  ContextType = GraphQLContext,
   ParentType extends
     ResolversParentTypes["User"] = ResolversParentTypes["User"],
 > = {
@@ -263,9 +367,12 @@ export type UserResolvers<
   username?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
 };
 
-export type Resolvers<ContextType = any> = {
+export type Resolvers<ContextType = GraphQLContext> = {
   AuthPayload?: AuthPayloadResolvers<ContextType>;
+  CreatePostResponse?: CreatePostResponseResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
+  Post?: PostResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  UploadUrlResponse?: UploadUrlResponseResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 };

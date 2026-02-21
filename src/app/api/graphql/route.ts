@@ -5,6 +5,10 @@ import type { GraphQLFormattedError } from "graphql";
 import type { NextRequest } from "next/server";
 import { treeifyError, ZodError } from "zod";
 import {
+  contentResolvers,
+  contentTypeDefs,
+} from "@/modules/content/presentation";
+import {
   identityResolvers,
   identityTypeDefs,
 } from "@/modules/identity/presentation";
@@ -12,9 +16,9 @@ import { AppError } from "@/shared";
 import type { GraphQLContext } from "@/shared/graphQlContext";
 import { tokenProvider } from "@/shared/infra/providers";
 
-const server = new ApolloServer({
-  typeDefs: identityTypeDefs,
-  resolvers: identityResolvers,
+const server = new ApolloServer<GraphQLContext>({
+  typeDefs: [identityTypeDefs, contentTypeDefs],
+  resolvers: [identityResolvers, contentResolvers],
   formatError: (
     formattedError: GraphQLFormattedError,
     error: unknown,
@@ -55,7 +59,7 @@ const server = new ApolloServer({
   },
 });
 
-const handler = startServerAndCreateNextHandler<NextRequest>(server, {
+const handler = startServerAndCreateNextHandler<NextRequest, GraphQLContext>(server, {
   context: async (req: NextRequest): Promise<GraphQLContext> => {
     const authHeader = req.headers.get("authorization") || "";
     if (!authHeader) return { user: null };

@@ -1,11 +1,14 @@
+export type PostStatus = "PROCESSING" | "PUBLISHED" | "FAILED";
+
 export interface PostProps {
   title: string;
-  storage_path: string; // uploads/posts/2026/02/a1b2-c3d4.webp
+  storage_path: string;
+  filename: string;
   author_id: string;
-  size: number; //bytes
+  size: number;
   tags: string[];
   mime_type: string;
-  status: "PUBLISHED";
+  status: PostStatus;
   created_at?: Date;
 }
 
@@ -33,6 +36,10 @@ export class Post {
     return this.props.storage_path;
   }
 
+  get filename() {
+    return this.props.filename;
+  }
+
   get author_id() {
     return this.props.author_id;
   }
@@ -55,5 +62,9 @@ export class Post {
 
   get created_at() {
     return this.props.created_at;
+  }
+
+  updateStatus(status: PostStatus) {
+    this.props.status = status;
   }
 }

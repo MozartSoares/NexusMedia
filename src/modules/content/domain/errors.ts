@@ -30,3 +30,33 @@ export class FileTooLargeError extends AppError {
     super(`File size exceeds maximum allowed (${maxMB}MB).`, "FILE_TOO_LARGE");
   }
 }
+
+export class FileNotFoundError extends AppError {
+  constructor() {
+    super("Uploaded file not found in storage.", "FILE_NOT_FOUND");
+  }
+}
+
+export class UnauthorizedError extends AppError {
+  constructor(message = "User is not authorized to perform this action.") {
+    super(message, "UNAUTHORIZED");
+  }
+}
+
+export class InvalidStoragePathError extends AppError {
+  constructor() {
+    super("Invalid storage path format.", "INVALID_STORAGE_PATH");
+  }
+}
+
+export class UnauthorizedStoragePathError extends AppError {
+  constructor() {
+    super("Unauthorized to access storage path.", "UNAUTHORIZED_STORAGE_PATH");
+  }
+}
+
+export class FileProcessingError extends AppError {
+  constructor() {
+    super("Failed to process uploaded file.", "FILE_PROCESSING_FAILED");
+  }
+}

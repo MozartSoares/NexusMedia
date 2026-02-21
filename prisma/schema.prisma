@@ -18,20 +18,20 @@ model User {
   username      String   @unique
   password_hash String
   created_at    DateTime @default(now())
-
   posts Post[]
 }
 
 model Post {
-  id           String   @id @unique
-  title        String
-  storage_path String
-  author_id    String
-  size         Int
-  tags         String[]
-  mime_type    String
-  status       String   @default("PUBLISHED")
-  created_at   DateTime @default(now())
+  id                String   @id @unique
+  title             String
+  storage_path      String
+  filename          String
+  author_id         String
+  size              Int
+  tags              String[]
+  mime_type         String
+  status            String   @default("PROCESSING")
+  created_at        DateTime @default(now())
 
   author User @relation(fields: [author_id], references: [id])
 

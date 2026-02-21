@@ -1,5 +1,4 @@
-import { createRandomId } from "@/shared/idGenerator";
-import { MediaAttachment } from "../../domain";
+import { MediaAttachment, StoragePath } from "../../domain";
 import type { IStorageProvider } from "../../domain/interfaces";
 import {
   type GetUploadUrlRequestDTO,
@@ -25,19 +24,20 @@ export class GetUploadUrl {
       size: validated.size,
     });
 
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const day = String(now.getDate()).padStart(2, "0");
-    const fileKey = `uploads/posts/${userId}/${year}/${month}/${day}/${createRandomId()}/${media.filename}.${media.extension}`;
+    const storagePath = StoragePath.build({
+      prefix: "temp",
+      userId,
+      extension: media.extension,
+    });
 
     const uploadUrl = await this.storageProvider.generatePresignedUploadUrl({
-      fileKey,
+      fileKey: storagePath.value,
       contentType: media.mimeType,
       size: media.size,
       expiresInSeconds: 300,
+      filename: media.filename,
     });
 
-    return { uploadUrl, fileKey };
+    return { uploadUrl, fileKey: storagePath.value }; // todo later we need to implement UploadToken so we dont expose url
   }
 }

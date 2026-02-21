@@ -7,11 +7,18 @@
     "build": "next build",
     "start": "next start",
     "lint": "biome check .",
-    "format": "biome format --write ."
+    "format": "biome format --write .",
+    "typecheck": "tsc --noEmit",
+    "codegen": "graphql-codegen",
+    "prisma:generate": "prisma generate",
+    "prisma:studio": "prisma studio",
+    "verify": "pnpm lint && pnpm typecheck"
   },
   "dependencies": {
     "@apollo/server": "^5.4.0",
     "@as-integrations/next": "^4.1.0",
+    "@aws-sdk/client-s3": "^3.995.0",
+    "@aws-sdk/s3-request-presigner": "^3.995.0",
     "@paralleldrive/cuid2": "^3.3.0",
     "@prisma/adapter-pg": "^7.4.1",
     "@prisma/client": "^7.4.1",

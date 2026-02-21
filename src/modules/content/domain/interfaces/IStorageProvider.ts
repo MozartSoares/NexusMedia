@@ -3,10 +3,18 @@ export interface IStorageProvider {
     fileKey: string;
     contentType: string;
     size: number;
+    filename: string;
     expiresInSeconds: number;
   }): Promise<string>;
 
-  fileExists(fileKey: string): Promise<boolean>;
+  getFileMetadata(
+    fileKey: string,
+  ): Promise<{ size: number; contentType: string; filename: string }>;
+
+  moveFile(params: {
+    sourceKey: string;
+    destinationKey: string;
+  }): Promise<void>;
 
   getPublicUrl(fileKey: string): string;
 }
