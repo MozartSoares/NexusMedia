@@ -27,3 +27,9 @@ export class UnauthorizedError extends AppError {
     super("Unauthorized access.", "UNAUTHORIZED");
   }
 }
+
+export class InvalidUsernameError extends AppError {
+  constructor() {
+    super("Username must be at least 3 characters long.", "INVALID_USERNAME");
+  }
+}

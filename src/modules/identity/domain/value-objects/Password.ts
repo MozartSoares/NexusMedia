@@ -1,10 +1,10 @@
 import { InvalidPasswordError } from "../errors";
 
 export class Password {
-  private readonly value: string;
+  private readonly _value: string;
 
   private constructor(password: string) {
-    this.value = password;
+    this._value = password;
   }
 
   static create(password: string): Password {
@@ -16,7 +16,7 @@ export class Password {
     return password.length >= 8;
   }
 
-  get getValue(): string {
-    return this.value;
+  get value(): string {
+    return this._value;
   }
 }

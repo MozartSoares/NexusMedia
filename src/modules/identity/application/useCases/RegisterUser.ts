@@ -1,15 +1,16 @@
+import { generateUserId } from "@/shared/idGenerator";
 import {
   type IHashProvider,
   type IUserRepository,
   Password,
   UserAlreadyExistsError,
+  UserFactory,
 } from "../../domain";
 import {
   type RegisterUserRequestDTO,
   type RegisterUserResponseDTO,
   RegisterUserSchema,
 } from "../dtos";
-import { UserFactory } from "../factories/UserFactory";
 import { UserMapper } from "../mappers/UserMapper";
 
 export class RegisterUser {
@@ -35,13 +36,17 @@ export class RegisterUser {
     }
 
     const passwordVO = Password.create(validatedData.password_plain);
-    const password_hash = await this.hashProvider.hash(passwordVO.getValue);
+    const password_hash = await this.hashProvider.hash(passwordVO.value);
 
-    const newUser = UserFactory.create({
-      email: validatedData.email,
-      username: validatedData.username,
-      password_hash,
-    });
+    const id = generateUserId();
+    const newUser = UserFactory.create(
+      {
+        email: validatedData.email,
+        username: validatedData.username,
+        password_hash,
+      },
+      id,
+    );
 
     const user = await this.userRepository.save(newUser);
 

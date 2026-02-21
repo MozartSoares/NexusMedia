@@ -1,10 +1,10 @@
 import { InvalidEmailError } from "../errors";
 
 export class Email {
-  private readonly value: string;
+  private readonly _value: string;
 
   private constructor(email: string) {
-    this.value = email;
+    this._value = email;
   }
 
   static create(email: string): Email {
@@ -17,7 +17,7 @@ export class Email {
     return emailRegex.test(email);
   }
 
-  get getValue(): string {
-    return this.value;
+  get value(): string {
+    return this._value;
   }
 }
