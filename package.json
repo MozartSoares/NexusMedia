@@ -15,7 +15,12 @@
     "codegen": "graphql-codegen",
     "prisma:generate": "prisma generate",
     "prisma:studio": "prisma studio",
-    "verify": "pnpm lint && pnpm typecheck"
+    "verify": "pnpm lint && pnpm typecheck",
+    "seed": "prisma db seed",
+    "prepare": "husky"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@apollo/server": "^5.4.0",
@@ -38,6 +43,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.4",
+    "@faker-js/faker": "^10.3.0",
     "@graphql-codegen/cli": "^6.1.1",
     "@graphql-codegen/typescript": "^5.0.8",
     "@graphql-codegen/typescript-resolvers": "^5.1.6",
@@ -47,7 +53,15 @@
     "@types/pg": "^8.16.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "prisma": "^7.4.1",
+    "tsx": "^4.21.0",
     "typescript": "^5"
+  },
+  "lint-staged": {
+    "*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
+      "biome check --no-errors-on-unmatched --files-ignore-unknown=true"
+    ]
   }
 }
