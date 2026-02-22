@@ -40,4 +40,3 @@ export const contentTypeDefs = gql`
   }
 `;
 
-export const schema = contentTypeDefs;

@@ -49,6 +49,31 @@ export type CreatePostResponse = {
   post: Post;
 };
 
+export type FeedInput = {
+  authorId?: InputMaybe<Scalars["String"]["input"]>;
+  cursor?: InputMaybe<Scalars["String"]["input"]>;
+  limit?: InputMaybe<Scalars["Int"]["input"]>;
+  tags?: InputMaybe<Array<Scalars["String"]["input"]>>;
+};
+
+export type FeedItem = {
+  __typename?: "FeedItem";
+  authorId: Scalars["String"]["output"];
+  createdAt: Scalars["String"]["output"];
+  id: Scalars["ID"]["output"];
+  mimeType: Scalars["String"]["output"];
+  tags: Array<Scalars["String"]["output"]>;
+  title: Scalars["String"]["output"];
+  url: Scalars["String"]["output"];
+};
+
+export type FeedResponse = {
+  __typename?: "FeedResponse";
+  hasMore: Scalars["Boolean"]["output"];
+  items: Array<FeedItem>;
+  nextCursor?: Maybe<Scalars["String"]["output"]>;
+};
+
 export type GetUploadUrlInput = {
   contentType: Scalars["String"]["input"];
   filename: Scalars["String"]["input"];
@@ -99,7 +124,12 @@ export type Post = {
 
 export type Query = {
   __typename?: "Query";
+  feed: FeedResponse;
   me?: Maybe<User>;
+};
+
+export type QueryFeedArgs = {
+  input: FeedInput;
 };
 
 export type RegisterInput = {
@@ -244,6 +274,9 @@ export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars["Boolean"]["output"]>;
   CreatePostInput: CreatePostInput;
   CreatePostResponse: ResolverTypeWrapper<CreatePostResponse>;
+  FeedInput: FeedInput;
+  FeedItem: ResolverTypeWrapper<FeedItem>;
+  FeedResponse: ResolverTypeWrapper<FeedResponse>;
   GetUploadUrlInput: GetUploadUrlInput;
   ID: ResolverTypeWrapper<Scalars["ID"]["output"]>;
   Int: ResolverTypeWrapper<Scalars["Int"]["output"]>;
@@ -263,6 +296,9 @@ export type ResolversParentTypes = {
   Boolean: Scalars["Boolean"]["output"];
   CreatePostInput: CreatePostInput;
   CreatePostResponse: CreatePostResponse;
+  FeedInput: FeedInput;
+  FeedItem: FeedItem;
+  FeedResponse: FeedResponse;
   GetUploadUrlInput: GetUploadUrlInput;
   ID: Scalars["ID"]["output"];
   Int: Scalars["Int"]["output"];
@@ -291,6 +327,34 @@ export type CreatePostResponseResolvers<
     ResolversParentTypes["CreatePostResponse"] = ResolversParentTypes["CreatePostResponse"],
 > = {
   post?: Resolver<ResolversTypes["Post"], ParentType, ContextType>;
+};
+
+export type FeedItemResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends
+    ResolversParentTypes["FeedItem"] = ResolversParentTypes["FeedItem"],
+> = {
+  authorId?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes["ID"], ParentType, ContextType>;
+  mimeType?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  tags?: Resolver<Array<ResolversTypes["String"]>, ParentType, ContextType>;
+  title?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+  url?: Resolver<ResolversTypes["String"], ParentType, ContextType>;
+};
+
+export type FeedResponseResolvers<
+  ContextType = GraphQLContext,
+  ParentType extends
+    ResolversParentTypes["FeedResponse"] = ResolversParentTypes["FeedResponse"],
+> = {
+  hasMore?: Resolver<ResolversTypes["Boolean"], ParentType, ContextType>;
+  items?: Resolver<Array<ResolversTypes["FeedItem"]>, ParentType, ContextType>;
+  nextCursor?: Resolver<
+    Maybe<ResolversTypes["String"]>,
+    ParentType,
+    ContextType
+  >;
 };
 
 export type MutationResolvers<
@@ -345,6 +409,12 @@ export type QueryResolvers<
   ParentType extends
     ResolversParentTypes["Query"] = ResolversParentTypes["Query"],
 > = {
+  feed?: Resolver<
+    ResolversTypes["FeedResponse"],
+    ParentType,
+    ContextType,
+    RequireFields<QueryFeedArgs, "input">
+  >;
   me?: Resolver<Maybe<ResolversTypes["User"]>, ParentType, ContextType>;
 };
 
@@ -370,6 +440,8 @@ export type UserResolvers<
 export type Resolvers<ContextType = GraphQLContext> = {
   AuthPayload?: AuthPayloadResolvers<ContextType>;
   CreatePostResponse?: CreatePostResponseResolvers<ContextType>;
+  FeedItem?: FeedItemResolvers<ContextType>;
+  FeedResponse?: FeedResponseResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Post?: PostResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;

@@ -9,6 +9,10 @@ import {
   contentTypeDefs,
 } from "@/modules/content/presentation";
 import {
+  discoveryResolvers,
+  discoveryTypeDefs,
+} from "@/modules/discovery/presentation";
+import {
   identityResolvers,
   identityTypeDefs,
 } from "@/modules/identity/presentation";
@@ -17,8 +21,8 @@ import type { GraphQLContext } from "@/shared/graphQlContext";
 import { tokenProvider } from "@/shared/infra/singletons";
 
 const server = new ApolloServer<GraphQLContext>({
-  typeDefs: [identityTypeDefs, contentTypeDefs],
-  resolvers: [identityResolvers, contentResolvers],
+  typeDefs: [identityTypeDefs, contentTypeDefs, discoveryTypeDefs],
+  resolvers: [identityResolvers, contentResolvers, discoveryResolvers],
   formatError: (
     formattedError: GraphQLFormattedError,
     error: unknown,

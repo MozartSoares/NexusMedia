@@ -1,5 +1,5 @@
 import type { Resolvers } from "@/generated/graphql";
-import { prisma } from "@/shared";
+import { prisma, s3ConnectionProvider } from "@/shared";
 import { CreatePost, GetUploadUrl } from "../../application/useCases";
 import { UnauthorizedError } from "../../domain/errors";
 import {
@@ -7,20 +7,8 @@ import {
   PrismaPostRepository,
   S3StorageProvider,
 } from "../../infra";
-
-const s3Config = {
-  endpoint: process.env.STORAGE_ENDPOINT || "http://localhost:9000",
-  region: process.env.STORAGE_REGION || "auto",
-  accessKeyId: process.env.STORAGE_ACCESS_KEY || "minioadmin",
-  secretAccessKey: process.env.STORAGE_SECRET_KEY || "minioadmin",
-  bucketName: process.env.STORAGE_BUCKET_NAME || "nexusmedia-content",
-  publicUrl:
-    process.env.STORAGE_PUBLIC_URL ||
-    "http://localhost:9000/nexusmedia-content",
-};
-
 const postRepository = new PrismaPostRepository(prisma);
-const storageProvider = new S3StorageProvider(s3Config);
+const storageProvider = new S3StorageProvider(s3ConnectionProvider);
 const tokenProvider = new JwtUploadTokenProvider();
 
 const createPostUseCase = new CreatePost(

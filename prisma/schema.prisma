@@ -35,6 +35,7 @@ model Post {
 
   author User @relation(fields: [author_id], references: [id])
 
-  @@index([created_at(sort: Desc)])
+  @@index([created_at(sort: Desc), id(sort: Desc)])
   @@index([author_id])
+  @@index([tags], type: Gin)
 }

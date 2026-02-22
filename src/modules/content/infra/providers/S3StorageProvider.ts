@@ -11,33 +11,15 @@ import {
   FileProcessingError,
   type IStorageProvider,
 } from "../../domain";
+import { S3ConnectionProvider } from "@/shared/infra/providers";
 
-interface S3Config {
-  endpoint: string;
-  region: string;
-  accessKeyId: string;
-  secretAccessKey: string;
-  bucketName: string;
-  publicUrl: string;
-}
-
-export class S3StorageProvider implements IStorageProvider {
+export class S3StorageProvider implements IStorageProvider  {
   private client: S3Client;
   private bucketName: string;
-  private publicUrl: string;
 
-  constructor(config: S3Config) {
-    this.client = new S3Client({
-      endpoint: config.endpoint,
-      region: config.region,
-      credentials: {
-        accessKeyId: config.accessKeyId,
-        secretAccessKey: config.secretAccessKey,
-      },
-      forcePathStyle: true, // For MinIO/R2 compatibility
-    });
-    this.bucketName = config.bucketName;
-    this.publicUrl = config.publicUrl;
+  constructor(private connection: S3ConnectionProvider) {
+    this.client = connection.client;
+    this.bucketName = connection.bucketName;
   }
 
   async generatePresignedUploadUrl(params: {
@@ -125,10 +107,6 @@ export class S3StorageProvider implements IStorageProvider {
   }
 
   getPublicUrl(fileKey: string): string {
-    // Ensure no double slashes if publicUrl has trailing slash
-    const base = this.publicUrl.endsWith("/")
-      ? this.publicUrl.slice(0, -1)
-      : this.publicUrl;
-    return `${base}/${fileKey}`;
+    return this.connection.getPublicUrl(fileKey);
   }
 }
