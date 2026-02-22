@@ -62,7 +62,6 @@ type LayoutConfig<Route extends LayoutRoutes = LayoutRoutes> = {
   type __IsExpected<Specific extends AppPageConfig<"/">> = Specific;
   const handler = {} as typeof import("../src/app/page.js");
   type __Check = __IsExpected<typeof handler>;
-  // @ts-expect-error
   type __Unused = __Check;
 }
 
@@ -71,6 +70,5 @@ type LayoutConfig<Route extends LayoutRoutes = LayoutRoutes> = {
   type __IsExpected<Specific extends LayoutConfig<"/">> = Specific;
   const handler = {} as typeof import("../src/app/layout.js");
   type __Check = __IsExpected<typeof handler>;
-  // @ts-expect-error
   type __Unused = __Check;
 }

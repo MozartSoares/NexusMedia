@@ -1,5 +1,5 @@
-import type { FeedCursorPayload } from "../valueObjects";
 import type { FeedItem } from "../entities";
+import type { FeedCursorPayload } from "../valueObjects";
 
 export interface FeedQuery {
   limit: number;

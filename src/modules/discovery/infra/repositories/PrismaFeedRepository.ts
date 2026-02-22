@@ -1,12 +1,12 @@
 import type { PrismaClient } from "@prisma/client";
 import type { S3ConnectionProvider } from "@/shared/infra/providers";
-import { FeedCursor } from "../../domain/valueObjects";
 import type {
   FeedItem,
   FeedQuery,
   FeedResult,
   IFeedRepository,
 } from "../../domain";
+import { FeedCursor } from "../../domain/valueObjects";
 
 export class PrismaFeedRepository implements IFeedRepository {
   constructor(

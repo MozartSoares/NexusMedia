@@ -3,15 +3,15 @@ import {
   DeleteObjectCommand,
   HeadObjectCommand,
   PutObjectCommand,
-  S3Client,
+  type S3Client,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import type { S3ConnectionProvider } from "@/shared/infra/providers";
 import {
   FileNotFoundError,
   FileProcessingError,
   type IStorageProvider,
 } from "../../domain";
-import { S3ConnectionProvider } from "@/shared/infra/providers";
 
 export class S3StorageProvider implements IStorageProvider {
   private client: S3Client;

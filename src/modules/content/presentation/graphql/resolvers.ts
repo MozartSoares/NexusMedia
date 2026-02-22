@@ -7,6 +7,7 @@ import {
   PrismaPostRepository,
   S3StorageProvider,
 } from "../../infra";
+
 const postRepository = new PrismaPostRepository(prisma);
 const storageProvider = new S3StorageProvider(s3ConnectionProvider);
 const tokenProvider = new JwtUploadTokenProvider();
