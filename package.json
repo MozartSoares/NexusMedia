@@ -18,6 +18,8 @@
     "verify": "pnpm lint && pnpm typecheck",
     "seed": "prisma db seed",
     "test": "vitest run",
+    "test:unit": "vitest run --project unit",
+    "test:integration": "vitest run --project integration",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "prepare": "husky"
