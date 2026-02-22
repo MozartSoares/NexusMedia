@@ -1,6 +1,10 @@
 import type { IFeedRepository } from "../../domain";
 import { FeedCursor } from "../../domain/valueObjects";
-import { type GetFeedRequestDTO, type GetFeedResponseDTO, GetFeedSchema } from "../dtos";
+import {
+  type GetFeedRequestDTO,
+  type GetFeedResponseDTO,
+  GetFeedSchema,
+} from "../dtos";
 
 export class GetFeed {
   constructor(private feedRepository: IFeedRepository) {}

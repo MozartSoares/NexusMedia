@@ -8,7 +8,7 @@ export interface FeedCursorPayload {
 export class FeedCursor {
   private constructor(
     public readonly createdAt: Date,
-    public readonly id: string
+    public readonly id: string,
   ) {}
 
   static decode(cursor: string): FeedCursor {

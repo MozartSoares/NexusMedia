@@ -11,7 +11,7 @@ import type {
 export class PrismaFeedRepository implements IFeedRepository {
   constructor(
     private prisma: PrismaClient,
-    private s3Connection: S3ConnectionProvider
+    private s3Connection: S3ConnectionProvider,
   ) {}
 
   async query(feedQuery: FeedQuery): Promise<FeedResult> {

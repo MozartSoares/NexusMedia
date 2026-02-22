@@ -1,4 +1,8 @@
-import { BCryptHashProvider, JWTokenProvider, S3ConnectionProvider } from "./providers/index";
+import {
+  BCryptHashProvider,
+  JWTokenProvider,
+  S3ConnectionProvider,
+} from "./providers/index";
 
 // Singletons
 export const hashProvider = new BCryptHashProvider();

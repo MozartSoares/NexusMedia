@@ -39,4 +39,3 @@ export const contentTypeDefs = gql`
     createPost(input: CreatePostInput!): CreatePostResponse!
   }
 `;
-

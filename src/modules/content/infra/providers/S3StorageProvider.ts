@@ -13,7 +13,7 @@ import {
 } from "../../domain";
 import { S3ConnectionProvider } from "@/shared/infra/providers";
 
-export class S3StorageProvider implements IStorageProvider  {
+export class S3StorageProvider implements IStorageProvider {
   private client: S3Client;
   private bucketName: string;
 
